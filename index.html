@@ -3,29 +3,28 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>تسجيل الدخول - قاعدة عملاء سلطان العسل</title>
+    <title>تسجيل الدخول - لوحة سلطان العسل</title>
     <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
 </head>
 <body class="login-page">
 
-    <img src="logo.png" alt="شعار سلطان العسل" class="logo">
+    <img src="logo.png" alt="شعار سلطان العسل" class="logo" onerror="this.style.display='none'">
     
     <div class="login-container">
-        <h2>تسجيل الدخول</h2>
+        <h2 style="margin-bottom: 20px; color: #4a3623;">تسجيل الدخول الآمن</h2>
+        
         <div class="input-group">
             <label for="email">البريد الإلكتروني</label>
             <input type="email" id="email" placeholder="أدخل البريد الإلكتروني">
         </div>
+        
         <div class="input-group">
             <label for="password">كلمة المرور</label>
             <input type="password" id="password" placeholder="أدخل كلمة المرور">
         </div>
-        <button class="login-btn" id="loginBtn">تسجيل دخول</button>
-    </div>
-
-    <div class="footer">
-        &copy; 2026 قاعدة عملاء سلطان العسل. جميع الحقوق محفوظة.
+        
+        <button class="login-btn" id="loginBtn">دخول للوحة التحكم</button>
     </div>
 
     <script type="module" src="script.js"></script>
