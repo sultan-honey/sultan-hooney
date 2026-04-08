@@ -1,0 +1,46 @@
+/* إعدادات عامة */
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: 'Tajawal', sans-serif; background-color: #fdfbf7; color: #4a3623; line-height: 1.6; }
+
+/* صفحة الدخول */
+body.login-page { display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 100vh; padding: 20px; }
+.login-container { background: #fff; padding: 40px; border-radius: 20px; box-shadow: 0 15px 35px rgba(0,0,0,0.1); width: 100%; max-width: 450px; text-align: center; border-top: 6px solid #e6b31e; }
+
+/* لوحة التحكم */
+body.dash-page { padding: 20px; max-width: 1200px; margin: 0 auto; }
+.navbar { display: flex; justify-content: space-between; align-items: center; background: #fff; padding: 20px; border-radius: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); margin-bottom: 30px; border-right: 5px solid #e6b31e; }
+.navbar h1 { font-size: 22px; color: #e6b31e; }
+
+/* صندوق الإحصائيات والأزرار */
+.top-actions { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-wrap: wrap; gap: 15px; }
+.stat-box { background: #fff; padding: 20px; border-radius: 15px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); text-align: center; flex: 1; min-width: 150px; border-bottom: 4px solid #25D366; }
+.stat-box p { font-size: 32px; font-weight: bold; color: #e6b31e; }
+
+/* زر الإكسل الفخم */
+.excel-btn { background-color: #1d6f42; color: white; border: none; padding: 12px 25px; border-radius: 10px; cursor: pointer; font-family: 'Tajawal'; font-weight: bold; display: flex; align-items: center; gap: 8px; transition: 0.3s; }
+.excel-btn:hover { background-color: #155231; transform: translateY(-2px); }
+
+/* الخانات الفخمة */
+.add-customer-box { background: #fff; padding: 30px; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.05); margin-bottom: 30px; }
+.form-group { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+.full-width { grid-column: span 2; }
+
+input, textarea { width: 100%; padding: 15px; border: 1px solid #e0e0e0; border-radius: 12px; font-family: 'Tajawal'; font-size: 15px; background: #fcfcfc; transition: 0.3s; }
+input:focus, textarea:focus { border-color: #e6b31e; outline: none; background: #fff; box-shadow: 0 0 10px rgba(230, 179, 30, 0.1); }
+textarea { resize: vertical; min-height: 100px; } /* يسمح بالنزول لسطر جديد تلقائياً */
+
+.add-btn { grid-column: span 2; background: #e6b31e; color: #fff; border: none; padding: 18px; border-radius: 12px; font-size: 18px; font-weight: bold; cursor: pointer; transition: 0.3s; margin-top: 10px; }
+.add-btn:hover { background: #cca01a; letter-spacing: 1px; }
+
+/* الجدول */
+.table-container { background: #fff; padding: 20px; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.05); overflow-x: auto; }
+table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+th { text-align: right; padding: 15px; background: #fdfaf0; color: #4a3623; font-weight: bold; border-bottom: 2px solid #eee; }
+td { padding: 15px; border-bottom: 1px solid #f5f5f5; }
+
+.whatsapp-btn { background: #25D366; color: white; padding: 8px 15px; border-radius: 8px; text-decoration: none; font-size: 13px; }
+.details-btn { background: #4a3623; color: white; border: none; padding: 8px 15px; border-radius: 8px; cursor: pointer; font-family: 'Tajawal'; font-size: 13px; margin-right: 5px; }
+
+/* النافذة المنبثقة */
+.modal { display: none; position: fixed; z-index: 999; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); }
+.modal-content { background: #fff; margin: 10% auto; padding: 30px; border-radius: 20px; width: 90%; max-width: 500px; text-align: right; border-top: 8px solid #e6b31e; }
