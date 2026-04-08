@@ -2,7 +2,7 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebas
 import { getAuth, signInWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-auth.js";
 import { getFirestore, collection, addDoc, onSnapshot, query, orderBy, serverTimestamp, doc, updateDoc } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
 
-// إعدادات قاعدة بياناتك (لا تغيرها)
+// إعدادات قاعدة بياناتك
 const firebaseConfig = {
     apiKey: "AIzaSyBlE0IMGJgSJyxc4BjA_aMQy_mZhHqv3eU",
     authDomain: "sultan-al-asal.firebaseapp.com",
@@ -20,8 +20,6 @@ const db = getFirestore(app);
 // أكواد صفحة تسجيل الدخول (index.html)
 // ==========================================
 if (document.getElementById('loginBtn')) {
-    
-    // إذا كان المستخدم مسجل دخول مسبقاً، حوله فوراً للوحة
     onAuthStateChanged(auth, (user) => {
         if (user) window.location.href = "dashboard.html";
     });
@@ -44,36 +42,69 @@ if (document.getElementById('loginBtn')) {
 if (document.getElementById('logoutBtn')) {
     let allCustomers = [];
 
-    // حماية الصفحة: طرد أي شخص غير مسجل دخول
     onAuthStateChanged(auth, (user) => { 
         if (!user) window.location.href = "index.html"; 
     });
 
-    // تسجيل الخروج
     document.getElementById('logoutBtn').addEventListener('click', () => { 
         signOut(auth); 
     });
 
-    // إضافة عميل جديد
+    // إضافة عميل جديد أو تحديث طلب عميل حالي
     document.getElementById('addBtn').addEventListener('click', async () => {
-        const name = document.getElementById('custName').value;
-        const phone = document.getElementById('custPhone').value;
-        const address = document.getElementById('custAddress').value;
-        const order = document.getElementById('custOrder').value;
+        const name = document.getElementById('custName').value.trim();
+        const phone = document.getElementById('custPhone').value.trim();
+        const address = document.getElementById('custAddress').value.trim();
+        const newOrder = document.getElementById('custOrder').value.trim();
 
-        if(!name || !phone) return alert("الاسم ورقم الجوال مطلوبان لإضافة العميل!");
+        if(!name || !phone) return alert("الاسم ورقم الجوال مطلوبان لإضافة العميل أو الطلب!");
 
         try {
-            await addDoc(collection(db, "customers"), {
-                name, phone, address, order, createdAt: serverTimestamp()
-            });
-            // تفريغ الخانات بعد الحفظ
+            // فحص هل العميل موجود مسبقاً
+            const existingCustomer = allCustomers.find(c => c.phone === phone);
+
+            if (existingCustomer) {
+                const customerRef = doc(db, "customers", existingCustomer.id);
+                
+                // جلب التاريخ والوقت الحالي بصيغة جميلة
+                const currentDate = new Date().toLocaleString('ar-SA', { 
+                    year: 'numeric', month: '2-digit', day: '2-digit',
+                    hour: '2-digit', minute: '2-digit'
+                });
+
+                // دمج الطلبات مع إضافة التاريخ للطلب الجديد
+                let updatedOrder = existingCustomer.order || "";
+                if (newOrder) {
+                    if (updatedOrder) {
+                        updatedOrder += `\n\n--- 🛒 طلب جديد (${currentDate}) ---\n` + newOrder;
+                    } else {
+                        updatedOrder = newOrder;
+                    }
+                }
+
+                // تحديث بيانات العميل في القاعدة
+                await updateDoc(customerRef, {
+                    order: updatedOrder,
+                    address: existingCustomer.address ? existingCustomer.address : address 
+                });
+                
+                alert("العميل مسجل مسبقاً! تمت إضافة الطلب الجديد وتاريخه لملفه بنجاح. 📦");
+
+            } else {
+                // العميل غير موجود، إنشاء سجل جديد
+                await addDoc(collection(db, "customers"), {
+                    name, phone, address, order: newOrder, createdAt: serverTimestamp()
+                });
+                alert("تم حفظ العميل الجديد بنجاح! 🐝");
+            }
+
+            // تفريغ الخانات
             document.querySelectorAll('.add-customer-box input, .add-customer-box textarea').forEach(i => i.value = "");
-            alert("تم حفظ العميل بنجاح! 🐝");
+            
         } catch (e) { alert("حدث خطأ! تأكد من اتصالك بالإنترنت."); console.error(e); }
     });
 
-    // جلب البيانات من القاعدة مباشرة ورسم الجدول
+    // جلب البيانات من القاعدة
     const q = query(collection(db, "customers"), orderBy("createdAt", "desc"));
     onSnapshot(q, (snapshot) => {
         document.getElementById('totalCustomersCount').innerText = snapshot.size;
@@ -82,7 +113,7 @@ if (document.getElementById('logoutBtn')) {
         renderTable(document.getElementById('searchInput').value);
     });
 
-    // وظيفة رسم الجدول (تدعم البحث)
+    // رسم الجدول
     window.renderTable = (searchTerm = "") => {
         const tableBody = document.getElementById('customersTableBody');
         tableBody.innerHTML = "";
@@ -90,7 +121,6 @@ if (document.getElementById('logoutBtn')) {
         allCustomers.forEach((c) => {
             if (searchTerm && !c.name.includes(searchTerm) && !c.phone.includes(searchTerm)) return; 
             
-            // تجهيز رقم الواتساب
             const wa = c.phone.startsWith('0') ? '966' + c.phone.substring(1) : c.phone;
             
             const row = `
@@ -107,7 +137,6 @@ if (document.getElementById('logoutBtn')) {
         });
     };
 
-    // تشغيل البحث عند الكتابة
     document.getElementById('searchInput').addEventListener('input', (e) => renderTable(e.target.value));
 
     // تصدير الإكسيل
@@ -117,7 +146,7 @@ if (document.getElementById('logoutBtn')) {
             "اسم العميل": c.name, 
             "الجوال": c.phone, 
             "العنوان": c.address || "", 
-            "تفاصيل الطلب": c.order || "",
+            "تفاصيل الطلب": (c.order || "").replace(/\n/g, " | "), 
             "تاريخ الإضافة": c.createdAt ? new Date(c.createdAt.toDate()).toLocaleString('ar-SA') : ''
         }));
         const worksheet = XLSX.utils.json_to_sheet(excelData);
@@ -155,7 +184,7 @@ if (document.getElementById('logoutBtn')) {
     }
     window.closeEditModal = () => { document.getElementById('editModal').style.display = "none"; }
 
-    // حفظ التعديلات في القاعدة
+    // حفظ التعديلات
     document.getElementById('saveEditBtn').addEventListener('click', async () => {
         const id = document.getElementById('editCustId').value;
         const newName = document.getElementById('editCustName').value;
