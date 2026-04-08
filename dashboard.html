@@ -12,7 +12,7 @@
 
     <div class="navbar">
         <h1>🍯 لوحة سلطان العسل</h1>
-        <button class="logout-btn" id="logoutBtn" style="background:#dc3545; color:white; border:none; padding:8px 15px; border-radius:8px; cursor:pointer;">خروج</button>
+        <button class="logout-btn" id="logoutBtn" style="background:#dc3545; color:white; border:none; padding:8px 15px; border-radius:8px; cursor:pointer; font-family:'Tajawal'; font-weight:bold;">تسجيل الخروج</button>
     </div>
 
     <div class="top-actions">
@@ -29,10 +29,10 @@
         <h2 style="margin-bottom: 20px; color:#4a3623;">إضافة عميل جديد</h2>
         <div class="form-group">
             <input type="text" id="custName" placeholder="الاسم الكامل للعميل">
-            <input type="number" id="custPhone" placeholder="رقم الجوال (05xxxxxxx)">
+            <input type="number" id="custPhone" placeholder="رقم الجوال (مثال: 0500000000)">
             <input type="text" id="custAddress" class="full-width" placeholder="العنوان بالتفصيل (الحي / الشارع / المدينة)">
             <textarea id="custOrder" class="full-width" placeholder="تفاصيل الطلب (اضغط Enter للنزول لسطر جديد لمنتج آخر)"></textarea>
-            <button class="add-btn" id="addBtn">حفظ البيانات والطلب</button>
+            <button class="add-btn" id="addBtn">حفظ بيانات العميل</button>
         </div>
     </div>
 
@@ -56,7 +56,24 @@
         <div class="modal-content">
             <h2 style="color:#e6b31e; margin-bottom:20px;">تفاصيل العميل والطلب</h2>
             <div id="modalData" style="font-size: 16px;"></div>
-            <button class="close-modal" onclick="closeModal()" style="background:#4a3623; color:white; border:none; padding:12px; width:100%; border-radius:10px; margin-top:20px; cursor:pointer;">إغلاق</button>
+            <button onclick="closeModal()" style="background:#4a3623; color:white; border:none; padding:12px; width:100%; border-radius:10px; margin-top:20px; cursor:pointer; font-family:'Tajawal'; font-weight:bold;">إغلاق النافذة</button>
+        </div>
+    </div>
+
+    <div id="editModal" class="modal">
+        <div class="modal-content">
+            <h2 style="color:#25D366; margin-bottom:20px;">✏️ تعديل بيانات العميل</h2>
+            <input type="hidden" id="editCustId">
+            <div class="form-group">
+                <input type="text" id="editCustName" placeholder="الاسم">
+                <input type="number" id="editCustPhone" placeholder="رقم الجوال">
+                <input type="text" id="editCustAddress" class="full-width" placeholder="العنوان">
+                <textarea id="editCustOrder" class="full-width" placeholder="تفاصيل الطلب"></textarea>
+            </div>
+            <div style="display: flex; gap: 10px; margin-top: 20px;">
+                <button id="saveEditBtn" style="background:#25D366; color:white; border:none; padding:12px; flex:1; border-radius:10px; cursor:pointer; font-family:'Tajawal'; font-weight:bold;">حفظ التعديل</button>
+                <button onclick="closeEditModal()" style="background:#dc3545; color:white; border:none; padding:12px; flex:1; border-radius:10px; cursor:pointer; font-family:'Tajawal'; font-weight:bold;">إلغاء</button>
+            </div>
         </div>
     </div>
 
