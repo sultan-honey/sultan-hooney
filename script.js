@@ -42,6 +42,7 @@ if (document.getElementById('loginBtn')) {
 if (document.getElementById('logoutBtn')) {
     let allCustomers = [];
 
+    // حماية الصفحة
     onAuthStateChanged(auth, (user) => { 
         if (!user) window.location.href = "index.html"; 
     });
@@ -50,7 +51,7 @@ if (document.getElementById('logoutBtn')) {
         signOut(auth); 
     });
 
-    // إضافة عميل جديد أو تحديث طلب عميل حالي
+    // 1. إضافة عميل جديد أو تحديث طلب عميل حالي
     document.getElementById('addBtn').addEventListener('click', async () => {
         const name = document.getElementById('custName').value.trim();
         const phone = document.getElementById('custPhone').value.trim();
@@ -60,19 +61,16 @@ if (document.getElementById('logoutBtn')) {
         if(!name || !phone) return alert("الاسم ورقم الجوال مطلوبان لإضافة العميل أو الطلب!");
 
         try {
-            // فحص هل العميل موجود مسبقاً
             const existingCustomer = allCustomers.find(c => c.phone === phone);
 
             if (existingCustomer) {
                 const customerRef = doc(db, "customers", existingCustomer.id);
                 
-                // جلب التاريخ والوقت الحالي بصيغة جميلة
                 const currentDate = new Date().toLocaleString('ar-SA', { 
                     year: 'numeric', month: '2-digit', day: '2-digit',
                     hour: '2-digit', minute: '2-digit'
                 });
 
-                // دمج الطلبات مع إضافة التاريخ للطلب الجديد
                 let updatedOrder = existingCustomer.order || "";
                 if (newOrder) {
                     if (updatedOrder) {
@@ -82,38 +80,32 @@ if (document.getElementById('logoutBtn')) {
                     }
                 }
 
-                // تحديث بيانات العميل في القاعدة
                 await updateDoc(customerRef, {
                     order: updatedOrder,
                     address: existingCustomer.address ? existingCustomer.address : address 
                 });
                 
-                alert("العميل مسجل مسبقاً! تمت إضافة الطلب الجديد وتاريخه لملفه بنجاح. 📦");
+                alert("العميل مسجل مسبقاً! تمت إضافة الطلب الجديد لملفه بنجاح. 📦");
 
             } else {
-                // العميل غير موجود، إنشاء سجل جديد
                 await addDoc(collection(db, "customers"), {
                     name, phone, address, order: newOrder, createdAt: serverTimestamp()
                 });
                 alert("تم حفظ العميل الجديد بنجاح! 🐝");
             }
 
-            // تفريغ الخانات
-            document.querySelectorAll('.add-customer-box input, .add-customer-box textarea').forEach(i => i.value = "");
+            // تفريغ الخانات بذكاء (الاحتفاظ بالرقم إذا جاء من الواتساب)
+            document.getElementById('custName').value = "";
+            document.getElementById('custAddress').value = "";
+            document.getElementById('custOrder').value = "";
+            if(!new URLSearchParams(window.location.search).get('phone')){
+               document.getElementById('custPhone').value = "";
+            }
             
         } catch (e) { alert("حدث خطأ! تأكد من اتصالك بالإنترنت."); console.error(e); }
     });
 
-    // جلب البيانات من القاعدة
-    const q = query(collection(db, "customers"), orderBy("createdAt", "desc"));
-    onSnapshot(q, (snapshot) => {
-        document.getElementById('totalCustomersCount').innerText = snapshot.size;
-        allCustomers = [];
-        snapshot.forEach((doc) => { allCustomers.push({ id: doc.id, ...doc.data() }); });
-        renderTable(document.getElementById('searchInput').value);
-    });
-
-    // رسم الجدول
+    // 2. وظيفة رسم الجدول
     window.renderTable = (searchTerm = "") => {
         const tableBody = document.getElementById('customersTableBody');
         tableBody.innerHTML = "";
@@ -137,9 +129,30 @@ if (document.getElementById('logoutBtn')) {
         });
     };
 
+    // 3. جلب البيانات والربط المباشر مع إضافة جوجل كروم 🌟
+    const q = query(collection(db, "customers"), orderBy("createdAt", "desc"));
+    onSnapshot(q, (snapshot) => {
+        document.getElementById('totalCustomersCount').innerText = snapshot.size;
+        allCustomers = [];
+        snapshot.forEach((doc) => { allCustomers.push({ id: doc.id, ...doc.data() }); });
+        
+        // التقاط الرقم من رابط إضافة الواتساب
+        const urlParams = new URLSearchParams(window.location.search);
+        const autoSearch = urlParams.get('phone');
+        
+        if (autoSearch) {
+            document.getElementById('searchInput').value = autoSearch;
+            document.getElementById('custPhone').value = autoSearch;
+            renderTable(autoSearch);
+        } else {
+            renderTable(document.getElementById('searchInput').value);
+        }
+    });
+
+    // البحث اليدوي العادي
     document.getElementById('searchInput').addEventListener('input', (e) => renderTable(e.target.value));
 
-    // تصدير الإكسيل
+    // 4. تصدير الإكسيل
     document.getElementById('exportExcelBtn').addEventListener('click', () => {
         if(allCustomers.length === 0) return alert("لا يوجد عملاء في القاعدة لتصديرهم!");
         const excelData = allCustomers.map(c => ({
@@ -155,7 +168,7 @@ if (document.getElementById('logoutBtn')) {
         XLSX.writeFile(workbook, "Sultan_Al_Asal_Customers.xlsx");
     });
 
-    // عرض التفاصيل
+    // 5. عرض التفاصيل
     window.showDetails = (id) => {
         const c = allCustomers.find(cust => cust.id === id);
         if(!c) return;
@@ -171,7 +184,7 @@ if (document.getElementById('logoutBtn')) {
     }
     window.closeModal = () => { document.getElementById('detailsModal').style.display = "none"; }
 
-    // فتح نافذة التعديل
+    // 6. النوافذ المنبثقة للتعديل
     window.openEditModal = (id) => {
         const c = allCustomers.find(cust => cust.id === id);
         if(!c) return;
@@ -184,7 +197,7 @@ if (document.getElementById('logoutBtn')) {
     }
     window.closeEditModal = () => { document.getElementById('editModal').style.display = "none"; }
 
-    // حفظ التعديلات
+    // 7. حفظ التعديلات
     document.getElementById('saveEditBtn').addEventListener('click', async () => {
         const id = document.getElementById('editCustId').value;
         const newName = document.getElementById('editCustName').value;
